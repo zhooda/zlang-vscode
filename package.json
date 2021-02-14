@@ -1,0 +1,25 @@
+{
+    "name": "zlang-vscode",
+    "displayName": "zlang-vscode",
+    "description": "Syntax highlighting for the z programming language",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.53.0"
+    },
+    "categories": [
+        "Programming Languages"
+    ],
+    "contributes": {
+        "languages": [{
+            "id": "zlang",
+            "aliases": ["zlang", "zlang"],
+            "extensions": [".z"],
+            "configuration": "./language-configuration.json"
+        }],
+        "grammars": [{
+            "language": "zlang",
+            "scopeName": "source.z",
+            "path": "./syntaxes/zlang.tmLanguage.json"
+        }]
+    }
+}

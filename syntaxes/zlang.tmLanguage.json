@@ -1,0 +1,583 @@
+{
+	"$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+	"name": "zlanglang",
+	"scopeName": "source.z",
+	"patterns": [
+	  {
+		"include": "#comment"
+	  },
+	  {
+		"include": "#constant"
+	  },
+	  {
+		"include": "#entity"
+	  },
+	  {
+		"include": "#invalid"
+	  },
+	  {
+		"include": "#keyword"
+	  },
+	  {
+		"include": "#operator"
+	  },
+	  {
+		"include": "#punctuation"
+	  },
+	  {
+		"include": "#string"
+	  },
+	  {
+		"include": "#support"
+	  },
+	  {
+		"include": "#variable"
+	  }
+	],
+	"repository": {
+	  "string_escaped_char": {
+		"patterns": [
+		  {
+			"match": "\\\\([0-7]{3}|[abfnrtv\\\\'\"]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})",
+			"name": "constant.character.escape.zlang"
+		  },
+		  {
+			"match": "\\\\[^0-7xuUabfnrtv\\'\"]",
+			"name": "invalid.illegal.unknown-escape.zlang"
+		  }
+		]
+	  },
+	  "string_placeholder": {
+		"patterns": [
+		  {
+			"match": "%(\\[\\d+\\])?([\\+#\\-0\\x20]{,2}((\\d+|\\*)?(\\.?(\\d+|\\*|(\\[\\d+\\])\\*?)?(\\[\\d+\\])?)?))?[vT%tbcdoqxXUbeEfFgGsp]",
+			"name": "constant.other.placeholder.zlang"
+		  }
+		]
+	  },
+	  "comment": {
+		"patterns": [
+		  {
+			"begin": "/\\*",
+			"end": "\\*/",
+			"captures": {
+			  "0": {
+				"name": "punctuation.definition.comment.zlang"
+			  }
+			},
+			"name": "comment.block.zlang"
+		  },
+		  {
+			"begin": "//",
+			"beginCaptures": {
+			  "0": {
+				"name": "punctuation.definition.comment.zlang"
+			  }
+			},
+			"end": "$",
+			"name": "comment.line.double-slash.zlang"
+		  }
+		]
+	  },
+	  "constant": {
+		"patterns": [
+		  {
+			"comment": "Floating-point literals",
+			"match": "(\\.\\d+([Ee][-+]\\d+)?i?)\\b|\\b\\d+\\.\\d*(([Ee][-+]\\d+)?i?\\b)?",
+			"name": "constant.numeric.floating-point.zlang"
+		  },
+		  {
+			"comment": "Integers",
+			"match": "\\b((0x[0-9a-fA-F]+)|(0[0-7]+i?)|(\\d+([Ee]\\d+)?i?)|(\\d+[Ee][-+]\\d+i?))\\b",
+			"name": "constant.numeric.integer.zlang"
+		  },
+		  {
+			"comment": "Language constants",
+			"match": "\\b(true|false|null)\\b",
+			"name": "constant.language.zlang"
+		  }
+		]
+	  },
+	  "entity": {
+		"patterns": [
+		  {
+			"match": "^(\\bfunc\\b)\\s(\\w+)?\\(([a-z]+)\\s(\\*)?([a-zA-Z]+)\\)",
+			"captures": {
+			  "1": {
+				"name": "keyword.function.zlang"
+			  },
+			  "2": {
+				"name": "entity.name.function.zlang"
+			  },
+			  "3": {
+				"name": "variable.other.receiver.zlang"
+			  }
+			}
+		  },
+		  {
+			"match": "(\\*)\\w+(\\.)(\\w+)",
+			"captures": {
+			  "1": {
+				"name": "punctuation.other.period.zlang"
+			  }
+			}
+		  },
+		  {
+			"comment": "Function Definitions",
+			"begin": "^(\\bfunc\\b)\\s(\\w+)",
+			"beginCaptures": {
+			  "1": {
+				"name": "keyword.function.zlang"
+			  },
+			  "2": {
+				"name": "entity.name.function.zlang"
+			  }
+			},
+			"end": "\\{",
+			"patterns": [
+			  {
+				"match": "(\\*)\\w+(\\.)(\\w+)",
+				"captures": {
+				  "1": {
+					"name": "punctuation.other.period.zlang"
+				  }
+				}
+			  },
+			  {
+				"include": "$self"
+			  }
+			]
+		  },
+		  {
+			"comment": "Function declarations",
+			"match": "^(\\bfunc\\b)(?:\\s+(\\([^\\)]+\\)\\s+)?(\\w+)(?=\\())?",
+			"captures": {
+			  "1": {
+				"name": "keyword.function.zlang"
+			  },
+			  "2": {
+				"patterns": [
+				  {
+					"include": "#brackets"
+				  },
+				  {
+					"include": "#operators"
+				  },
+				  {
+					"include": "#variable"
+				  }
+				]
+			  },
+			  "3": {
+				"patterns": [
+				  {
+					"match": "\\d\\w*",
+					"name": "invalid.illegal.identifier.zlang"
+				  },
+				  {
+					"match": "\\w+",
+					"name": "entity.name.function.zlang"
+				  }
+				]
+			  }
+			}
+		  },
+		  {
+			"comment": "Functions",
+			"match": "(\\bfunc\\b)|(\\w+)(?=\\()",
+			"captures": {
+			  "1": {
+				"name": "keyword.function.zlang"
+			  },
+			  "2": {
+				"patterns": [
+				  {
+					"match": "\\d\\w*",
+					"name": "invalid.illegal.identifier.zlang"
+				  },
+				  {
+					"match": "\\w+",
+					"name": "support.function.zlang"
+				  }
+				]
+			  }
+			}
+		  },
+		  {
+			"begin": "\\b(package)\\s+",
+			"beginCaptures": {
+			  "1": {
+				"name": "keyword.package.zlang"
+			  }
+			},
+			"end": "(?!\\G)",
+			"patterns": [
+			  {
+				"match": "\\d\\w*",
+				"name": "invalid.illegal.identifier.zlang"
+			  },
+			  {
+				"match": "\\w+",
+				"name": "entity.name.package.zlang"
+			  }
+			]
+		  }
+		]
+	  },
+	  "invalid": {
+		"patterns": []
+	  },
+	  "keyword": {
+		"patterns": [
+		  {
+			"comment": "Flow control keywords",
+			"match": "\\b(break|case|continue|default|else|for|if|return|select|switch)\\b",
+			"name": "keyword.control.zlang"
+		  },
+		  {
+			"match": "\\bconst\\b",
+			"name": "keyword.const.zlang"
+		  },
+		  {
+			"match": "\\blet\\b",
+			"name": "keyword.let.zlang"
+		  },
+		  {
+			"match": "\\bfn\\b",
+			"name": "keyword.function.zlang"
+		  }
+		]
+	  },
+	  "operator": {
+		"comment": "Note that the order here is very important!",
+		"patterns": [
+		  {
+			"match": "\\-\\-",
+			"name": "keyword.operator.decrement.zlang"
+		  },
+		  {
+			"match": "\\+\\+",
+			"name": "keyword.operator.increment.zlang"
+		  },
+		  {
+			"match": "(==|!=|<=|>=|<(?!<)|>(?!>))",
+			"name": "keyword.operator.comparison.zlang"
+		  },
+		  {
+			"match": "(&&|\\|\\||!)",
+			"name": "keyword.operator.logical.zlang"
+		  },
+		  {
+			"match": "(=|\\+=|\\-=|\\|=|\\^=|\\*=|/=|:=|%=|<<=|>>=|&\\^=|&=)",
+			"name": "keyword.operator.assignment.zlang"
+		  },
+		  {
+			"match": "(\\+|\\-|\\*|/|%)",
+			"name": "keyword.operator.arithmetic.zlang"
+		  },
+		  {
+			"match": "(\\||\\^|&\\^|<<|>>)",
+			"name": "keyword.operator.arithmetic.bitwise.zlang"
+		  },
+		  {
+			"match": "\\.\\.\\.",
+			"name": "keyword.operator.ellipsis.zlang"
+		  }
+		]
+	  },
+	  "punctuation": {
+		"patterns": [
+		  {
+			"match": ";",
+			"name": "punctuation.terminator.zlang"
+		  },
+		  {
+			"match": ",",
+			"name": "punctuation.other.comma.zlang"
+		  },
+		  {
+			"match": "\\.(?!\\.\\.)",
+			"name": "punctuation.other.period.zlang"
+		  },
+		  {
+			"match": ":(?!=)",
+			"name": "punctuation.other.colon.zlang"
+		  },
+		  {
+			"begin": "{",
+			"beginCaptures": {
+			  "0": {
+				"name": "punctuation.definition.begin.bracket.curly.zlang"
+			  }
+			},
+			"end": "}",
+			"endCaptures": {
+			  "0": {
+				"name": "punctuation.definition.end.bracket.curly.zlang"
+			  }
+			},
+			"patterns": [
+			  {
+				"include": "$self"
+			  }
+			]
+		  }
+		]
+	  },
+	  "string": {
+		"patterns": [
+		  {
+			"comment": "Interpreted string literals",
+			"begin": "\"",
+			"beginCaptures": {
+			  "0": {
+				"name": "punctuation.definition.string.begin.zlang"
+			  }
+			},
+			"end": "\"",
+			"endCaptures": {
+			  "0": {
+				"name": "punctuation.definition.string.end.zlang"
+			  }
+			},
+			"name": "string.quoted.double.zlang",
+			"patterns": [
+			  {
+				"include": "#string_escaped_char"
+			  },
+			  {
+				"include": "#string_placeholder"
+			  },
+			  {
+				"include": "source.zlangtemplate"
+			  }
+			]
+		  },
+		  {
+			"comment": "Raw string literals",
+			"begin": "`",
+			"beginCaptures": {
+			  "0": {
+				"name": "punctuation.definition.string.begin.zlang"
+			  }
+			},
+			"end": "`",
+			"endCaptures": {
+			  "0": {
+				"name": "punctuation.definition.string.end.zlang"
+			  }
+			},
+			"name": "string.quoted.raw.zlang",
+			"patterns": [
+			  {
+				"include": "#string_placeholder"
+			  },
+			  {
+				"include": "source.zlangtemplate"
+			  }
+			]
+		  },
+		  {
+			"begin": "'",
+			"beginCaptures": {
+			  "0": {
+				"name": "punctuation.definition.string.begin.zlang"
+			  }
+			},
+			"end": "'",
+			"endCaptures": {
+			  "0": {
+				"name": "punctuation.definition.string.end.zlang"
+			  }
+			}
+		  }
+		]
+	  },
+	  "support": {
+		"patterns": [
+		  {
+			"comment": "Built-in functions",
+			"match": "\\b(len|print|first|last|rest|push)\\b(?=\\()",
+			"name": "support.function.builtin.zlang"
+		  }
+		]
+	  },
+	  "variable": {
+		"patterns": [
+		  {
+			"match": "\\b(var)\\s+(\\w+)\\s+(?:\\[\\])?(?:\\w+(\\.))+?(\\w+)",
+			"captures": {
+			  "1": {
+				"name": "keyword.var.zlang"
+			  },
+			  "2": {
+				"name": "variable.other.declaration.zlang"
+			  },
+			  "3": {
+				"name": "punctuation.other.period.zlang"
+			  }
+			}
+		  },
+		  {
+			"match": "\\b(var)\\s+(\\w+)\\s+(?:\\[\\])?(?!map)(\\w+)",
+			"captures": {
+			  "1": {
+				"name": "keyword.var.zlang"
+			  },
+			  "2": {
+				"name": "variable.other.declaration.zlang"
+			  }
+			}
+		  },
+		  {
+			"match": "\\b(var)\\s+(\\w+)\\s+(\\=)",
+			"captures": {
+			  "1": {
+				"name": "keyword.var.zlang"
+			  },
+			  "2": {
+				"name": "variable.other.declaration.zlang"
+			  },
+			  "3": {
+				"name": "keyword.operator.assignment.zlang"
+			  }
+			}
+		  },
+		  {
+			"match": "\\b(?>[a-zA-Z](?:\\w+)?)\\b(?=\\[)",
+			"name": "variable.other.accessor.zlang"
+		  },
+		  {
+			"match": "\\b(var)\\b",
+			"name": "keyword.var.zlang"
+		  },
+		  {
+			"match": "_",
+			"name": "variable.other.blank.zlang"
+		  },
+		  {
+			"match": "\\w+(?=\\s\\:\\=)",
+			"name": "variable.other.assignment.zlang"
+		  },
+		  {
+			"comment": "increment",
+			"match": "(?>\\w+)(?=\\+\\+)",
+			"name": "variable.other.zlang"
+		  },
+		  {
+			"comment": "decrement",
+			"match": "(?>\\w+)(?=\\-\\-)",
+			"name": "variable.other.zlang"
+		  },
+		  {
+			"match": "(\\w+)(,)\\s(\\w+)\\s(\\:\\=)",
+			"captures": {
+			  "1": {
+				"name": "variable.other.assignment.zlang"
+			  },
+			  "2": {
+				"name": "punctuation.other.comma.zlang"
+			  },
+			  "3": {
+				"name": "variable.other.assignment.zlang"
+			  },
+			  "4": {
+				"name": "keyword.operator.assignment.zlang"
+			  }
+			}
+		  },
+		  {
+			"begin": "(?<=\\w)\\(",
+			"end": "\\)|$",
+			"patterns": [
+			  {
+				"include": "$self"
+			  },
+			  {
+				"match": "(?<!\\[)\\b(?>[a-zA-Z](?:\\w+)?)\\b(?!\\]|\\.)",
+				"name": "variable.other.arg.zlang"
+			  }
+			]
+		  },
+		  {
+			"match": "(?<!var)\\s*(\\w+(?:\\.\\w+)*(?>,\\s*\\w+(?:\\.\\w+)*)*)(?=\\s*=(?!=))",
+			"captures": {
+			  "1": {
+				"patterns": [
+				  {
+					"match": "\\d\\w*",
+					"name": "invalid.illegal.identifier.zlang"
+				  },
+				  {
+					"match": "_",
+					"name": "variable.other.blank.zlang"
+				  },
+				  {
+					"match": "\\w+(?:\\.\\w+)*",
+					"name": "variable.other.assignment.zlang",
+					"captures": {
+					  "0": {
+						"patterns": [
+						  {
+							"include": "#punctuation"
+						  }
+						]
+					  }
+					}
+				  },
+				  {
+					"include": "#punctuation"
+				  }
+				]
+			  }
+			}
+		  },
+		  {
+			"match": "(\\w+(?:,\\s*\\w+)*)(\\s+(\\[(\\d*|\\.\\.\\.)\\])*\\*?(<-)?\\w+(?:\\.\\w+)?\\s*[^=].*)",
+			"captures": {
+			  "1": {
+				"patterns": [
+				  {
+					"match": "\\d\\w*",
+					"name": "invalid.illegal.identifier.zlang"
+				  },
+				  {
+					"match": "(?<=\\.)(\\w+)",
+					"name": "entity.name.type.zlang"
+				  },
+				  {
+					"match": "\\w+",
+					"name": "variable.other.declaration.zlang"
+				  },
+				  {
+					"include": "#punctuation"
+				  }
+				]
+			  },
+			  "2": {
+				"patterns": [
+				  {
+					"include": "$self"
+				  }
+				]
+			  }
+			}
+		  },
+		  {
+			"begin": "\\b(var)\\s+",
+			"beginCaptures": {
+			  "1": {
+				"name": "keyword.var.zlang"
+			  }
+			},
+			"end": "(?!\\G)",
+			"patterns": [
+			  {
+				"include": "$self"
+			  }
+			]
+		  }
+		]
+	  }
+	}
+  }
